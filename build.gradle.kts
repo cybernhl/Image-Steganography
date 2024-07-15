@@ -26,6 +26,15 @@ kotlin {
     jvmToolchain(8)
 }
 
+tasks.jar {
+    manifest {
+//        attributes["Main-Class"] = "your.package.name.YourMainClass"
+        attributes["Main-Class"] = "Main" // 注意這裡沒有套件名稱
+    }
+    // 將所有依賴項包含在 JAR 檔案中
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+}
+
 tasks.test {
     useJUnitPlatform()
 }
