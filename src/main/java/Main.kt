@@ -12,7 +12,6 @@ import java.nio.ByteBuffer
 import java.nio.file.Paths
 import java.util.*
 
-
 class Steganography : CliktCommand() {
     override fun run() = Unit
 }
@@ -37,9 +36,12 @@ class Embed : CliktCommand(help = "Embed a file or a string in an image") {
         }
 
         val steganographer = LSB(numberOfBits, 3)
-        var coverImage: Image = Image(inputImagePath).copy()
+        val filebyteArray: ByteArray  = File(inputImagePath).readBytes()
+//        var coverImage: Image = Image(inputImagePath).copy()
+        var coverImage: ImageRelay = ImageRelay(filebyteArray).copy()
         if (message != "") {
-            coverImage = steganographer.embed(message.toByteArray(), Image(inputImagePath))
+//            coverImage = steganographer.embed(message.toByteArray(), Image(inputImagePath))
+            coverImage = steganographer.embed(message.toByteArray(),  ImageRelay(filebyteArray))
         } else if (messageFilePath != "") {
             val inputStream = FileInputStream(messageFilePath)
             val fileBytes: ByteArray = IOUtils.toByteArray(inputStream)
@@ -51,7 +53,8 @@ class Embed : CliktCommand(help = "Embed a file or a string in an image") {
             val sizeByteArray = buffer.array()
 
             val fileNameBytes = fileName.toByteArray()
-            coverImage = steganographer.embed(sizeByteArray + fileNameBytes + fileBytes, Image(inputImagePath))
+            coverImage = steganographer.embed(sizeByteArray + fileNameBytes + fileBytes, ImageRelay(filebyteArray))
+//            coverImage = steganographer.embed(sizeByteArray + fileNameBytes + fileBytes, Image(inputImagePath))
         }
         coverImage.export(outputImagePath)
         TermUi.echo("Cover image saved to " + outputImagePath + ".")
@@ -66,11 +69,15 @@ class Extract : CliktCommand(help = "Extract a file or a string from an image.")
     override fun run() {
         if (outputDirectoryPath == "") {
             val steganographer = LSB()
-            val message: String = String(steganographer.extract(Image(inputImagePath)))
+            val filebyteArray: ByteArray  = File(inputImagePath).readBytes()
+//            val message: String = String(steganographer.extract(Image(inputImagePath)))
+            val message: String = String(steganographer.extract(ImageRelay(filebyteArray)))
             TermUi.echo(message)
         } else {
             val steganographer = LSB()
-            val message: ByteArray = steganographer.extract(Image(inputImagePath))
+            val filebyteArray: ByteArray  = File(inputImagePath).readBytes()
+//            val message: ByteArray = steganographer.extract(Image(inputImagePath))
+            val message: ByteArray = steganographer.extract(ImageRelay(filebyteArray))
             val fileNameLengthBytes = Arrays.copyOfRange(message, 0, 4)
             val fileNameLength = ByteBuffer.wrap(fileNameLengthBytes).int
             val fileNameBytes = Arrays.copyOfRange(message, 4, 4 + fileNameLength)

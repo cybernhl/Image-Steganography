@@ -17,7 +17,8 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
         val bitIndex = offset % 8
 
         if (byteIndex < message.size - 1) {
-            val number = (message[byteIndex].toInt().shl(8)) or (message[byteIndex + 1].toInt() and 255)
+            val number =
+                (message[byteIndex].toInt().shl(8)) or (message[byteIndex + 1].toInt() and 255)
 
             val thing1 = number shr (16 - (bitIndex + k))
             val thing2 = (1 shl k) - 1
@@ -35,8 +36,8 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
     }
 
     // Function that actually writes the message to the cover image
-    private fun fill(message: ByteArray, coverImage: Image): Image {
-
+//    private fun fill(message: ByteArray, coverImage: Image): Image {
+    private fun fill(message: ByteArray, coverImage: ImageRelay): ImageRelay {
         // We avoid side effects (altering coverImage's content), by copying it first
         val result = coverImage.copy()
 
@@ -100,7 +101,8 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
         return result
     }
 
-    override fun embed(message: ByteArray, coverImage: Image): Image {
+    //    override fun embed(message: ByteArray, coverImage: Image): Image {
+    override fun embed(message: ByteArray, coverImage: ImageRelay): ImageRelay {
         // Check that message fits into image
         val numberOfBytesInImage = coverImage.width * coverImage.height * 3
         val numberOfUsableBitsInImage = numberOfBytesInImage * this.numberOfBits
@@ -119,7 +121,8 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
         return fill(newMessage, coverImage)
     }
 
-    override fun extract(coverImage: Image): ByteArray {
+    //    override fun extract(coverImage: Image): ByteArray {
+    override fun extract(coverImage: ImageRelay): ByteArray {
         var lsb = getLSB(coverImage[0, 0])
 
         val messageSize = ByteBuffer.wrap(readKByte(lsb, 0, 4, coverImage)).int
@@ -143,7 +146,8 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
         This functions reads k bytes starting from offset and uses lsb
         offset is in BITS
      */
-    fun readKByte(lsb: Int, offset: Int, k: Int, image: Image): ByteArray {
+//    fun readKByte(lsb: Int, offset: Int, k: Int, image: Image): ByteArray {
+    fun readKByte(lsb: Int, offset: Int, k: Int, image: ImageRelay): ByteArray {
         var counter = 0
         val numberOfBits = k * 8
         var seekPointer = 0
